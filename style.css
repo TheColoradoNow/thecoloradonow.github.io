@@ -1,69 +1,58 @@
-
 body {
   font-family: Georgia, serif;
   margin: 0;
   padding: 0;
-  background: #fff;
+  background: #ffffff;
+  color: #000000;
 }
 
-.site-header {
-  max-width: 800px;
-  margin: 0 auto;
-  padding-top: 10px;
-  text-align: center;
+.top-link {
+  padding: 10px 20px;
+  font-size: 14px;
 }
 
-.top-bar {
-  text-align: left;
-  padding: 10px 20px 0;
-  font-size: 0.9em;
-}
-
-.contact-link {
+.top-link a {
   text-decoration: none;
-  color: #333;
+  color: #000000;
 }
 
-.logo-section {
-  position: relative;
+.main-header {
+  border-top: 2px solid #000;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 20px;
+}
+
+.logo-social-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  margin: 0 auto;
 }
 
 .logo {
-  max-width: 280px;
-  height: auto;
+  height: 60px;
 }
 
-.social-icons {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+.social-icons img {
+  margin-left: 10px;
+  vertical-align: middle;
 }
 
-.social-icons a {
-  text-decoration: none;
-  font-size: 1.2em;
-  margin: 0 6px;
-  color: #000;
-}
-
-.nav-links {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+.main-nav {
+  text-align: center;
   margin-top: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ccc;
 }
 
-.nav-links a {
+.main-nav a {
+  margin: 0 15px;
   text-decoration: none;
   color: #000;
   font-weight: bold;
+}
+
+.articles {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 0 20px;
 }
 
 .article-area {
