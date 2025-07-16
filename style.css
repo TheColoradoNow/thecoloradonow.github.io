@@ -54,3 +54,13 @@ body {
     margin: 30px auto;
     padding: 0 20px;
 }
+.logo-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.logo {
+    height: 70px;
+    max-width: 100%;
+}
