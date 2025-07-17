@@ -61,6 +61,25 @@ body {
 }
 
 .logo {
-    height: 70px;
+    height: 100px;
     max-width: 100%;
+}
+.social-icons a img {
+    height: 24px;
+    margin-left: 10px;
+    vertical-align: middle;
+    border: none;
+    outline: none;
+}
+
+.social-icons a {
+    text-decoration: none;
+    outline: none;
+}
+
+.social-icons a:focus,
+.social-icons a:active,
+.social-icons a:hover {
+    outline: none;
+    border: none;
 }
