@@ -58,7 +58,7 @@ body {
     flex-grow: 1;
     display: flex;
     justify-content: center;
-    padding-left: 100px; /* Shift logo to the right */
+    padding-left: 200px; /* Shift logo to the right */
 }
 
 .logo {
