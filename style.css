@@ -40,6 +40,9 @@ body {
 .main-nav {
     text-align: center;
     margin-top: 10px;
+    border-top: 1px solid #ccc; /* NEW: top border */
+    padding-top: 10px; /* NEW: spacing above the nav text */
+    padding-bottom: 10px; /* Keeps spacing consistent */
 }
 
 .main-nav a {
