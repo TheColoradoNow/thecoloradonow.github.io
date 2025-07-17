@@ -65,7 +65,7 @@ body {
 .logo {
     height: 120px;
     max-width: 100%;
-    margin-bottom: 20px; /* moves logo up */
+    margin-bottom: -40px; /* moves logo up */
 }
 .social-icons a img {
     height: 24px;
