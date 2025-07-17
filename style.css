@@ -43,7 +43,6 @@ body {
     border-top: 1px solid #ccc; /* NEW: top border */
     padding-top: 10px; /* NEW: spacing above the nav text */
     padding-bottom: 5px; /* Keeps spacing consistent */
-    background: #f0f0f0;
 }
 
 .main-nav a {
