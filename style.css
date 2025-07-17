@@ -1,0 +1,92 @@
+body {
+    font-family: Georgia, serif;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #000000;
+}
+
+.top-link {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+.top-link a {
+    text-decoration: none;
+    color: #000000;
+}
+
+.main-header {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 20px;
+}
+
+.logo-social-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    height: 50px;
+}
+
+.social-icons img {
+    height: 24px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.main-nav {
+    text-align: center;
+    margin-top: 10px;
+    border-top: 1px solid #ccc; /* NEW: top border */
+    padding-top: 10px; /* NEW: spacing above the nav text */
+    padding-bottom: 1px; /* Keeps spacing consistent */
+}
+
+.main-nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.articles {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+.logo-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    left: 60px; /* Shift logo visually right */
+}
+
+.logo {
+    height: 120px;
+    max-width: 100%;
+    position: relative;
+    top: -20px; /* moves the logo UP */
+}
+.social-icons a img {
+    height: 24px;
+    margin-left: 10px;
+    vertical-align: middle;
+    border: none;
+    outline: none;
+}
+
+.social-icons a {
+    text-decoration: none;
+    outline: none;
+}
+
+.social-icons a:focus,
+.social-icons a:active,
+.social-icons a:hover {
+    outline: none;
+    border: none;
+}
