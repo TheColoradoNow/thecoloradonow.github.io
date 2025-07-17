@@ -69,7 +69,7 @@ body {
     height: 120px;
     max-width: 100%;
     position: relative;
-    top: -40px; /* moves the logo UP */
+    top: -20px; /* moves the logo UP */
 }
 .social-icons a img {
     height: 24px;
