@@ -134,9 +134,9 @@ body {
 .subscribe-form-container {
     display: flex;
     justify-content: center;
+    align-items: center;
+    height: 60vh;
     flex-direction: column;
-    height: auto; /* Changed from 60vh */
-    padding-top: 80px; /* This controls how far down the form starts */
 }
 
 .subscribe-form-container form {
