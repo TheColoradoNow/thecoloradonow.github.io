@@ -63,7 +63,7 @@ body {
     display: flex;
     justify-content: center;
     position: relative;
-    left: 30px; /* Shift logo visually right */
+    left: 20px; /* Shift logo visually right */
 }
 
 .logo {
