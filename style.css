@@ -112,6 +112,7 @@ body {
     transform: scale(1.1);
 }
 .subscribe-link {
+    text-align: center;
     padding-top: 15px;
     margin-top: -10px;
     font-family: Georgia, serif;
