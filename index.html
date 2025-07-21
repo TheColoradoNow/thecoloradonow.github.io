@@ -43,17 +43,17 @@
         </nav>
     </header>
 
-    <main class="articles" role="main">
-   <section id="editors-picks" class="homepage-section">
-  <h2>Editor's Picks</h2>
-  <div class="article-list" id="editors-picks-list"></div>
-</section>
+   <main class="articles homepage-sections-wrapper" role="main">
+  <section id="editors-picks" class="homepage-section">
+    <h2>Editor's Picks</h2>
+    <div class="article-list" id="editors-picks-list"></div>
+  </section>
 
-<section id="latest-articles" class="homepage-section">
-  <h2>The Latest</h2>
-  <div class="article-list" id="latest-articles-list"></div>
-</section>
-    </main>
+  <section id="latest-articles" class="homepage-section">
+    <h2>The Latest</h2>
+    <div class="article-list" id="latest-articles-list"></div>
+  </section>
+</main>
     <script>
   const articles = JSON.parse(localStorage.getItem('articles') || '[]');
 
