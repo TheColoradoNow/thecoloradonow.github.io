@@ -247,3 +247,59 @@ body {
     background-color: #eee;
     transform: translateY(-3px);
 }
+/* === Homepage Sections: Editor's Picks & The Latest === */
+
+.homepage-section {
+  margin: 40px 20px;
+}
+
+.homepage-section h2 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 10px;
+}
+
+.article-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Individual article cards */
+.homepage-article-card {
+  flex: 1 1 calc(50% - 20px);
+  background-color: #f8f8f8;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: box-shadow 0.3s;
+}
+
+.homepage-article-card:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.homepage-article-card img.thumb {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.homepage-article-card h3 {
+  margin: 10px 0 5px;
+  font-size: 1.2em;
+}
+
+.homepage-article-card p {
+  margin: 0;
+  color: #555;
+}
+
+/* === Responsive: Stack on small screens === */
+@media (max-width: 600px) {
+  .homepage-article-card {
+    flex: 1 1 100%;
+  }
+}
