@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Articles</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Georgia, serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    button.delete-btn {
+      background-color: #c00;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+    }
+    button.delete-btn:hover {
+      background-color: #900;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manage Published Articles</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Tag</th>
+        <th>Views</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="articlesTable">
+      <!-- Articles will be loaded here -->
+    </tbody>
+  </table>
+
+  <script>
+    function loadArticles() {
+      const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+      const table = document.getElementById('articlesTable');
+      table.innerHTML = '';
+
+      articles.forEach((article, index) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${article.title}</td>
+          <td>${article.author}</td>
+          <td>${article.tag}</td>
+          <td>${article.views || 0}</td>
+          <td><button class="delete-btn" onclick="deleteArticle(${article.id})">Delete</button></td>
+        `;
+
+        table.appendChild(row);
+      });
+    }
+
+    function deleteArticle(id) {
+      if (!confirm("Are you sure you want to delete this article?")) return;
+
+      let articles = JSON.parse(localStorage.getItem('articles') || '[]');
+      articles = articles.filter(article => article.id !== id);
+      localStorage.setItem('articles', JSON.stringify(articles));
+      loadArticles();
+    }
+
+    loadArticles();
+  </script>
+</body>
+</html>
