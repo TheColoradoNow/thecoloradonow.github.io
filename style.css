@@ -297,9 +297,22 @@ body {
   color: #555;
 }
 
+.homepage-sections-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.homepage-section {
+  flex: 1 1 48%;
+}
 /* === Responsive: Stack on small screens === */
 @media (max-width: 600px) {
-  .homepage-article-card {
+  .homepage-section {
     flex: 1 1 100%;
   }
 }
