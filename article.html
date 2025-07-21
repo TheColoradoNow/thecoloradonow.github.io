@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Georgia, serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .article-title {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .author {
+      font-style: italic;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+    .date {
+      color: #666;
+      font-size: 0.85em;
+      margin-bottom: 20px;
+    }
+    .article-body {
+      line-height: 1.6;
+    }
+    img {
+      max-width: 100%;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="articleContainer"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = Number(params.get('id'));
+    const container = document.getElementById('articleContainer');
+
+    const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+    const article = articles.find(a => a.id === id);
+
+    if (!article) {
+      container.innerHTML = '<p>Article not found.</p>';
+    } else {
+      // Increment views
+      article.views = (article.views || 0) + 1;
+      localStorage.setItem('articles', JSON.stringify(articles));
+
+      const date = new Date(article.timestamp).toLocaleDateString();
+      container.innerHTML = `
+        <h1 class="article-title">${article.title}</h1>
+        <div class="author">By ${article.author}</div>
+        <div class="date">Published on ${date} | ${article.views} views</div>
+        ${article.image ? `<img src="${article.image}" alt="Article Image">` : ''}
+        <div class="article-body">${article.body}</div>
+      `;
+    }
+  </script>
+</body>
+</html>
