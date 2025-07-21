@@ -69,27 +69,37 @@
     </div>
     <nav class="main-nav">
       <a href="index.html">HOME</a>
-      <a onclick="reloadPage('lifestyle.html')">LIFESTYLE & CULTURE</a>
+      <a onclick="life & culture">LIFESTYLE & CULTURE</a>
       <a href="news.html">NEWS</a>
-      <a href="#">OPINION</a>
+      <a href="opinion.html">OPINION</a>
       <a href="#">YOUTUBE</a>
       <a href="#">ABOUT US</a>
     </nav>
   </header>
 
   <main>
-    <section class="category-grid">
+  <section class="category-grid">
+
+    <a href="tag.html?tag=people">
       <div class="category-box" style="background-image: url('images/people.jpg');">
         <span>People</span>
       </div>
+    </a>
+
+    <a href="tag.html?tag=events">
       <div class="category-box" style="background-image: url('images/events.jpg');">
         <span>Events</span>
       </div>
+    </a>
+
+    <a href="tag.html?tag=reviews">
       <div class="category-box" style="background-image: url('images/reviews.jpg');">
         <span>Reviews</span>
       </div>
-    </section>
-  </main>
+    </a>
+
+  </section>
+</main>
 
   <script>
     function reloadPage(path) {
