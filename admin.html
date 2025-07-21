@@ -115,6 +115,35 @@
 
     document.getElementById('articleForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      const article = {
+  title: document.getElementById('title').value,
+  author: document.getElementById('author').value,
+  image: document.getElementById('image').value,
+  body: document.getElementById('body').value,
+  date: new Date().toISOString()
+};
+
+// 2. Determine selected tag
+const activeTag = document.querySelector('.tag-button.active')?.dataset.group;
+const newsTag = document.getElementById('newsDropdown').value;
+const cultureTag = document.getElementById('cultureDropdown').value;
+
+if (activeTag === 'news') {
+  article.tag = newsTag;
+} else if (activeTag === 'culture') {
+  article.tag = cultureTag;
+} else {
+  article.tag = 'opinion';
+}
+
+// 3. Retrieve existing articles from localStorage (or empty array)
+const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+
+// 4. Add new article to beginning of array
+articles.unshift(article);
+
+// 5. Save updated array to localStorage
+localStorage.setItem('articles', JSON.stringify(articles));
 
       const title = document.getElementById('title').value;
       const author = document.getElementById('author').value;
