@@ -47,7 +47,7 @@
     tagTitle.textContent = tag.replace(/-/g, ' ');
 
     const filtered = articles.filter(article =>
-      article.selectedTag === tag
+      article.tag === tag
     );
 
     if (filtered.length === 0) {
@@ -60,8 +60,8 @@
   <a href="article.html?id=${article.id}" style="text-decoration: none; color: inherit;">
     <h2>${article.title}</h2>
     <div class="author">By ${article.author}</div>
-    ${article.image ? `<img src="${article.image}" alt="Article Image">` : ''}
-    <p>${article.body.substring(0, 250)}...</p>
+    ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}">` : ''}
+    <p>${article.body.split(' ').slice(0, 40).join(' ')}...</p>
   </a>
 `;
         container.appendChild(div);
