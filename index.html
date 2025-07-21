@@ -11,7 +11,7 @@
         <a href="mailto:thecoloradonow@gmail.com">Contact the editor</a>
     </div>
 <div class="subscribe-link">
-    <a href="subscribe.html">Subscribe</a
+    <a href="subscribe.html">Subscribe</a>
 </div>
     <header class="main-header">
         <div class="logo-social-container">
@@ -43,8 +43,47 @@
         </nav>
     </header>
 
-    <main class="articles">
-        <!-- Recent articles will go here -->
+    <main class="articles" role="main">
+   <section id="editors-picks" class="homepage-section">
+  <h2>Editor's Picks</h2>
+  <div class="article-list" id="editors-picks-list"></div>
+</section>
+
+<section id="latest-articles" class="homepage-section">
+  <h2>The Latest</h2>
+  <div class="article-list" id="latest-articles-list"></div>
+</section>
     </main>
+    <script>
+  const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+
+  // Sort by timestamp descending
+  const sorted = articles.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  // Get up to 2 most recent Editor's Picks
+  const editorsPicks = sorted.filter(article => article.editorsPick).slice(0, 2);
+
+  // Get up to 2 most recent articles overall
+  const latestArticles = sorted.slice(0, 2);
+
+  function createArticleCard(article) {
+    const div = document.createElement('div');
+    div.className = 'homepage-article-card';
+    div.innerHTML = `
+      <a href="article.html?id=${article.id}">
+        ${article.image ? `<img src="${article.image}" alt="${article.title}" class="thumb">` : ''}
+        <h3>${article.title}</h3>
+        <p>By ${article.author}</p>
+      </a>
+    `;
+    return div;
+  }
+
+  const editorsList = document.getElementById('editors-picks-list');
+  const latestList = document.getElementById('latest-articles-list');
+
+  editorsPicks.forEach(article => editorsList.appendChild(createArticleCard(article)));
+  latestArticles.forEach(article => latestList.appendChild(createArticleCard(article)));
+</script>
 </body>
 </html>
