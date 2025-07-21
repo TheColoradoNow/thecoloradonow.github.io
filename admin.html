@@ -113,91 +113,44 @@
       });
     });
 
-    document.getElementById('articleForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const article = {
-  title: document.getElementById('title').value,
-  author: document.getElementById('author').value,
-  image: document.getElementById('image').value,
-  body: document.getElementById('body').value,
-  date: new Date().toISOString()
-};
+   document.getElementById('articleForm').addEventListener('submit', function(e) {e.preventDefault();
 
-// 2. Determine selected tag
-const activeTag = document.querySelector('.tag-button.active')?.dataset.group;
-const newsTag = document.getElementById('newsDropdown').value;
-const cultureTag = document.getElementById('cultureDropdown').value;
+  const activeGroup = document.querySelector('.tag-button.active')?.dataset.group || '';
+  let selectedTag = '';
 
-if (activeTag === 'news') {
-  article.tag = newsTag;
-} else if (activeTag === 'culture') {
-  article.tag = cultureTag;
-} else {
-  article.tag = 'opinion';
-}
+  if (activeGroup === 'news') {
+    selectedTag = newsDropdown.value;
+  } else if (activeGroup === 'culture') {
+    selectedTag = cultureDropdown.value;
+  } else if (activeGroup === 'opinion') {
+    selectedTag = 'opinion';
+  }
 
-// 3. Retrieve existing articles from localStorage (or empty array)
-const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+  if (!selectedTag) {
+    alert("Please select a tag.");
+    return;
+  }
 
-// 4. Add new article to beginning of array
-articles.unshift(article);
+  const newArticle = {
+    id: Date.now(),
+    title: document.getElementById('title').value,
+    author: document.getElementById('author').value,
+    image: document.getElementById('image').value,
+    body: document.getElementById('body').value,
+    tag: selectedTag,
+    timestamp: new Date().toISOString()
+  };
 
-// 5. Save updated array to localStorage
-localStorage.setItem('articles', JSON.stringify(articles));
+  const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+  articles.unshift(newArticle);
+  localStorage.setItem('articles', JSON.stringify(articles));
 
-      const title = document.getElementById('title').value;
-      const author = document.getElementById('author').value;
-      const image = document.getElementById('image').value;
-      const body = document.getElementById('body').value;
-
-      let tag = '';
-      if (selectedTag === 'news') {
-        tag = newsDropdown.value;
-      } else if (selectedTag === 'culture') {
-        tag = cultureDropdown.value;
-      } else {
-        tag = 'opinion';
-      }
-
-      const article = {
-        id: Date.now(),
-        title,
-        author,
-        image,
-        body,
-        tag,
-        timestamp: new Date().toISOString()
-      };
-
-      const existing = JSON.parse(localStorage.getItem('articles') || '[]');
-      existing.unshift(article);
-      localStorage.setItem('articles', JSON.stringify(existing));
-
-      const activeTag = document.querySelector('.tag-button.active')?.dataset.group || '';
-const selectedTag = 
-  activeTag === 'news' ? newsDropdown.value :
-  activeTag === 'culture' ? cultureDropdown.value :
-  activeTag === 'opinion' ? 'opinion' : '';
-
-const newArticle = {
-  title: document.getElementById('title').value,
-  author: document.getElementById('author').value,
-  image: document.getElementById('image').value,
-  body: document.getElementById('body').value,
-  selectedTag: selectedTag
-};
-
-const articles = JSON.parse(localStorage.getItem('articles') || '[]');
-articles.push(newArticle);
-localStorage.setItem('articles', JSON.stringify(articles));
-
-alert("Article published!");
-this.reset();
-tagButtons.forEach(b => b.classList.remove('active'));
-newsDropdown.style.display = 'none';
-cultureDropdown.style.display = 'none';
-    });
-  </script>
+  alert("Article published!");
+  this.reset();
+  tagButtons.forEach(b => b.classList.remove('active'));
+  newsDropdown.style.display = 'none';
+  cultureDropdown.style.display = 'none';
+});
+      </script>
 </body>
 </html>
-
