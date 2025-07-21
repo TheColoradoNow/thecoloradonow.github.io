@@ -94,6 +94,7 @@
     const tagButtons = document.querySelectorAll('.tag-button');
     const newsDropdown = document.getElementById('newsDropdown');
     const cultureDropdown = document.getElementById('cultureDropdown');
+    let selectedTag = '';
 
     tagButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -102,10 +103,11 @@
 
         newsDropdown.style.display = 'none';
         cultureDropdown.style.display = 'none';
+        selectedTag = button.dataset.group;
 
-        if (button.dataset.group === 'news') {
+        if (selectedTag === 'news') {
           newsDropdown.style.display = 'block';
-        } else if (button.dataset.group === 'culture') {
+        } else if (selectedTag === 'culture') {
           cultureDropdown.style.display = 'block';
         }
       });
@@ -113,8 +115,60 @@
 
     document.getElementById('articleForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      alert("Article publishing functionality will be implemented in the next step.");
+
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const image = document.getElementById('image').value;
+      const body = document.getElementById('body').value;
+
+      let tag = '';
+      if (selectedTag === 'news') {
+        tag = newsDropdown.value;
+      } else if (selectedTag === 'culture') {
+        tag = cultureDropdown.value;
+      } else {
+        tag = 'opinion';
+      }
+
+      const article = {
+        id: Date.now(),
+        title,
+        author,
+        image,
+        body,
+        tag,
+        timestamp: new Date().toISOString()
+      };
+
+      const existing = JSON.parse(localStorage.getItem('articles') || '[]');
+      existing.unshift(article);
+      localStorage.setItem('articles', JSON.stringify(existing));
+
+      const activeTag = document.querySelector('.tag-button.active')?.dataset.group || '';
+const selectedTag = 
+  activeTag === 'news' ? newsDropdown.value :
+  activeTag === 'culture' ? cultureDropdown.value :
+  activeTag === 'opinion' ? 'opinion' : '';
+
+const newArticle = {
+  title: document.getElementById('title').value,
+  author: document.getElementById('author').value,
+  image: document.getElementById('image').value,
+  body: document.getElementById('body').value,
+  selectedTag: selectedTag
+};
+
+const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+articles.push(newArticle);
+localStorage.setItem('articles', JSON.stringify(articles));
+
+alert("Article published!");
+this.reset();
+tagButtons.forEach(b => b.classList.remove('active'));
+newsDropdown.style.display = 'none';
+cultureDropdown.style.display = 'none';
     });
   </script>
 </body>
 </html>
+
