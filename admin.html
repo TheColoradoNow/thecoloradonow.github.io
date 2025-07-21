@@ -165,6 +165,7 @@
         tag: selectedTag,
         timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
         views: 0
+        editorsPick: document.getElementById('editorsPick').checked
       };
 
       const articles = JSON.parse(localStorage.getItem('articles') || '[]');
