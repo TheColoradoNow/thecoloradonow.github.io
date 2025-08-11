@@ -262,7 +262,7 @@ body {
 
 .article-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column; /* stack articles vertically */
   gap: 20px;
 }
 
@@ -309,6 +309,18 @@ body {
 
 .homepage-section {
   flex: 1 1 48%;
+}
+
+/* Add divider line on desktop only */
+@media (min-width: 601px) {
+  #latest-articles {
+    border-right: 2px solid #ccc; /* light gray divider */
+    padding-right: 20px;
+  }
+
+  #editors-picks {
+    padding-left: 20px;
+  }
 }
 /* === Responsive: Stack on small screens === */
 @media (max-width: 600px) {
