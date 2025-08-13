@@ -76,16 +76,20 @@
       tableBody.innerHTML = '';
       for (const article of sorted) {
         const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${article.title}</td>
-          <td>${article.author}</td>
-          <td>${article.tag}</td>
-          <td>${new Date(article.timestamp).toLocaleString()}</td>
-          <td>${article.views || 0}</td>
-          <td class="actions">
-            <button onclick="deleteArticle(${article.id})">Delete</button>
-          </td>
-        `;
+       row.innerHTML = `
+  <td>
+    <a href="article.html?id=${article.id}" style="color: inherit; text-decoration: none;">
+      ${article.title}
+    </a>
+  </td>
+  <td>${article.author}</td>
+  <td>${article.tag}</td>
+  <td>${new Date(article.timestamp).toLocaleString()}</td>
+  <td>${article.views || 0}</td>
+  <td class="actions">
+    <button onclick="deleteArticle(${article.id})">Delete</button>
+  </td>
+`;
         tableBody.appendChild(row);
       }
     }
