@@ -256,7 +256,7 @@ body {
 .homepage-section h2 {
   font-size: 1.8em;
   font-weight: bold;
-  color: #B5281A; /* Colorado flag red */
+  color: #b2222f; /* Colorado flag red */
   margin: 0 0 15px 0;
   border-bottom: 2px solid #ccc;
   padding-bottom: 8px;
@@ -335,10 +335,10 @@ body {
 
 .article-list h3:hover,
 .article h2:hover {
-  color: #B5281A; /* Colorado flag red on hover */
+  color: #b2222f; /* Colorado flag red on hover */
 }
 
 /* Hover effect for admin-manage article links */
 #articlesTable a:hover {
-  color: #B5281A;
+  color: #b2222f;
 }
