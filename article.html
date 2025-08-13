@@ -33,6 +33,26 @@
       max-width: 100%;
       margin: 20px 0;
     }
+    .tag-pills {
+  margin: 8px 0 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid #B5281A;   /* Colorado red */
+  color: #B5281A;               /* Colorado red */
+  border-radius: 9999px;        /* fully rounded pill */
+  font-size: 0.85em;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.tag-pill:hover {
+  background: #B5281A;
+  color: #fff;
+}
   </style>
 </head>
 <body>
@@ -40,28 +60,47 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const id = Number(params.get('id'));
-    const container = document.getElementById('articleContainer');
+const idParam = params.get('id');
+const id = Number(idParam);
+const container = document.getElementById('articleContainer');
 
-    const articles = JSON.parse(localStorage.getItem('articles') || '[]');
-    const article = articles.find(a => a.id === id);
+if (!idParam || Number.isNaN(id)) {
+  container.innerHTML = '<p>Invalid article link.</p>';
+} else {
+  const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+  const article = articles.find(a => a.id === id);
 
-    if (!article) {
-      container.innerHTML = '<p>Article not found.</p>';
-    } else {
-      // Increment views
-      article.views = (article.views || 0) + 1;
-      localStorage.setItem('articles', JSON.stringify(articles));
+  if (!article) {
+    container.innerHTML = '<p>Article not found.</p>';
+  } else {
+    // Increment views
+    article.views = (article.views || 0) + 1;
+    localStorage.setItem('articles', JSON.stringify(articles));
 
-      const date = new Date(article.timestamp).toLocaleDateString();
-      container.innerHTML = `
-        <h1 class="article-title">${article.title}</h1>
-        <div class="author">By ${article.author}</div>
-        <div class="date">Published on ${date} | ${article.views} views</div>
-        ${article.image ? `<img src="${article.image}" alt="Article Image">` : ''}
-        <div class="article-body">${article.body}</div>
-      `;
-    }
+    const dateStr = article.timestamp
+      ? new Date(article.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+      : 'Unknown date';
+
+    // Make sure we always have an array of tags
+    const tags = Array.isArray(article.tag) ? article.tag : (article.tag ? [article.tag] : []);
+
+    // Build the pills HTML
+    const pillsHTML = tags.map(t => {
+      const slug = String(t);
+      const label = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      return `<a class="tag-pill" href="tag.html?tag=${encodeURIComponent(slug)}">${label}</a>`;
+    }).join('');
+
+    container.innerHTML = `
+      <h1 class="article-title">${article.title}</h1>
+      <div class="author">By ${article.author || ''}</div>
+      <div class="date">Published on ${dateStr} | ${article.views} views</div>
+      ${tags.length ? `<div class="tag-pills">${pillsHTML}</div>` : ''}
+      ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
+      <div class="article-body">${article.body || ''}</div>
+    `;
+  }
+}
   </script>
 </body>
 </html>
