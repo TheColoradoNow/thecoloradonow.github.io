@@ -20,16 +20,16 @@
 </div>
             <!-- Social icons moved outside the logo container -->
 <div class="floating-social-icons">
-    <a href="https://www.youtube.com/channel/UC9jHCl7DGI06N2CYL3oVkeg" target="_blank">
+    <a href="https://www.youtube.com/channel/UC9jHCl7DGI06N2CYL3oVkeg" target="_blank" rel="noopener noreferrer">
         <img src="icons/youtube.svg" alt="YouTube">
     </a>
-    <a href="https://x.com/TheColoradoNow?t=9fow3WxCvWgdqVWR6Kkg4A&s=09" target="_blank">
+    <a href="https://x.com/TheColoradoNow?t=9fow3WxCvWgdqVWR6Kkg4A&s=09" target="_blank" rel="noopener noreferrer">
         <img src="icons/x.svg" alt="X">
     </a>
-    <a href="https://www.instagram.com/coloradonow_?igsh=MXZieDc5NGQ4a3VkdA==" target="_blank">
+    <a href="https://www.instagram.com/coloradonow_?igsh=MXZieDc5NGQ4a3VkdA==" target="_blank" rel="noopener noreferrer">
         <img src="icons/instagram.svg" alt="Instagram">
     </a>
-    <a href="https://www.tiktok.com/@coloradonow_?_t=ZP-8y5WI6rMnjL&_r=1" target="_blank">
+    <a href="https://www.tiktok.com/@coloradonow_?_t=ZP-8y5WI6rMnjL&_r=1" target="_blank" rel="noopener noreferrer">
         <img src="icons/tiktok.svg" alt="TikTok">
     </a>
 </div>
@@ -61,7 +61,7 @@
   const articles = JSON.parse(localStorage.getItem('articles') || '[]');
 
   // Sort by timestamp descending
-  const sorted = articles.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const sorted = [...articles].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   // Get up to 2 most recent Editor's Picks
   const editorsPicks = sorted.filter(article => article.editorsPick).slice(0, 2);
@@ -74,7 +74,7 @@
     div.className = 'homepage-article-card';
     div.innerHTML = `
       <a href="article.html?id=${article.id}">
-        ${article.image ? `<img src="${article.image}" alt="${article.title}" class="thumb">` : ''}
+        ${article.image ? `<img src="${article.image}" alt="${article.title}" class="thumb" loading="lazy">` : ''}
         <h3>${article.title}</h3>
         <p>By ${article.author}</p>
       </a>
