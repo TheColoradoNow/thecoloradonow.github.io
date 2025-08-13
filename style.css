@@ -255,9 +255,12 @@ body {
 
 .homepage-section h2 {
   font-size: 1.8em;
-  margin-bottom: 20px;
+  font-weight: bold;
+  color: #B5281A; /* Colorado flag red */
+  margin: 0 0 15px 0;
   border-bottom: 2px solid #ccc;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
+  display: inline-block;
 }
 
 .article-list {
@@ -268,7 +271,7 @@ body {
 
 /* Individual article cards */
 .homepage-article-card {
-  flex: 1 1 calc(50% - 20px);
+  width: 100%; /* full width of its section */
   background-color: #f8f8f8;
   padding: 15px;
   border: 1px solid #ddd;
@@ -313,13 +316,24 @@ body {
 }
 
 @media (min-width: 601px) {
-  /* Divider only on desktop */
+  /* Add spacing between sections without a divider */
   #latest-articles {
-    border-right: 2px solid #ccc;
     padding-right: 20px;
   }
 
   #editors-picks {
     padding-left: 20px;
   }
+}
+
+/* Default article title color and hover effect sitewide */
+.article-list h3,
+.article h2 {
+  color: #000; /* default black */
+  transition: color 0.2s ease;
+}
+
+.article-list h3:hover,
+.article h2:hover {
+  color: #B5281A; /* Colorado flag red on hover */
 }
