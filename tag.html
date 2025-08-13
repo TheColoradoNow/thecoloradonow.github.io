@@ -32,6 +32,9 @@
       font-size: 0.9em;
       margin-bottom: 10px;
     }
+    .article p { 
+    word-break: break-word; 
+  }
   </style>
 </head>
 <body>
@@ -40,33 +43,37 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const tag = params.get('tag');
+const rawTag = params.get('tag') || '';
+const tag = decodeURIComponent(rawTag).toLowerCase(); // robust & case-insensitive
     const articles = JSON.parse(localStorage.getItem('articles') || '[]');
     const container = document.getElementById('articlesContainer');
     const tagTitle = document.getElementById('tagTitle');
-    tagTitle.textContent = tag.replace(/-/g, ' ');
+    tagTitle.textContent = tag
+  .replace(/-/g, ' ')
+  .replace(/\b\w/g, c => c.toUpperCase());
 
-    const filtered = articles.filter(article =>
-      article.tag === tag
-    );
+    const filtered = articles.filter(article => {
+  const tags = Array.isArray(article.tag) ? article.tag : [article.tag];
+  return tags.map(t => String(t).toLowerCase()).includes(tag);
+}).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    if (filtered.length === 0) {
-      container.innerHTML = "<p>No articles found for this topic yet.</p>";
-    } else {
-      filtered.reverse().forEach(article => {
-        const div = document.createElement('div');
-        div.className = 'article';
-        div.innerHTML = `
-  <a href="article.html?id=${article.id}" style="text-decoration: none; color: inherit;">
-    <h2>${article.title}</h2>
-    <div class="author">By ${article.author}</div>
-    ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}">` : ''}
-    <p>${article.body.split(' ').slice(0, 40).join(' ')}...</p>
-  </a>
-`;
-        container.appendChild(div);
-      });
-    }
+if (filtered.length === 0) {
+  container.innerHTML = "<p>No articles found for this topic yet.</p>";
+} else {
+  filtered.forEach(article => {
+    const div = document.createElement('div');
+    div.className = 'article';
+    div.innerHTML = `
+      <a href="article.html?id=${article.id}" style="text-decoration: none; color: inherit;">
+        <h2>${article.title}</h2>
+        <div class="author">By ${article.author || ''}</div>
+        ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
+        <p>${(article.body || '').split(' ').slice(0, 40).join(' ')}...</p>
+      </a>
+    `;
+    container.appendChild(div);
+  });
+}
   </script>
 </body>
 </html>
