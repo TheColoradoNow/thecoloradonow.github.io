@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -25,27 +26,6 @@
       margin-top: 5px;
       font-size: 16px;
     }
-    .tag-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .dropdown {
-      display: none;
-      margin-top: 5px;
-    }
-    .tag-button {
-      flex-grow: 1;
-      padding: 10px;
-      background: #eee;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      text-align: center;
-    }
-    .tag-button.active {
-      background: #ccc;
-    }
     .admin-nav {
       text-align: center;
       margin-bottom: 20px;
@@ -53,7 +33,45 @@
     .admin-nav a {
       margin: 0 10px;
       text-decoration: none;
-      color: #B5281A;
+      color: #B5281A; /* brand red */
+    }
+
+    /* Tag groups */
+    .tag-groups {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .tag-group {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .tag-group h3 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+    }
+    .checkbox-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px 14px;
+    }
+    .checkbox-list label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-weight: normal;
+    }
+    .inline-hint {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
+      display: block;
+    }
+    button[type="submit"] {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -73,7 +91,7 @@
     <input type="text" id="author" required>
 
     <label for="image">Image URL:</label>
-    <input type="url" id="image">
+    <input type="url" id="image" placeholder="https://…">
 
     <label for="body">Article Content:</label>
     <textarea id="body" rows="10" required></textarea>
@@ -81,102 +99,78 @@
     <label for="date">Publication Date (optional):</label>
     <input type="date" id="date">
 
-    <label>Tags:</label>
-    <div class="tag-group">
-      <div class="tag-button" data-group="news">NEWS</div>
-      <div class="tag-button" data-group="culture">LIFE & CULTURE</div>
-      <div class="tag-button" data-group="opinion">OPINION</div>
+    <label>Tags (choose one or more):</label>
+    <div class="tag-groups">
+      <div class="tag-group">
+        <h3>News</h3>
+        <div class="checkbox-list">
+          <label><input type="checkbox" name="tags" value="happening-now"> Happening Now</label>
+          <label><input type="checkbox" name="tags" value="politics"> Politics</label>
+          <label><input type="checkbox" name="tags" value="environment"> Environment</label>
+          <label><input type="checkbox" name="tags" value="transportation"> Transportation</label>
+          <label><input type="checkbox" name="tags" value="education"> Education</label>
+        </div>
+      </div>
+
+      <div class="tag-group">
+        <h3>Life & Culture</h3>
+        <div class="checkbox-list">
+          <label><input type="checkbox" name="tags" value="people"> People</label>
+          <label><input type="checkbox" name="tags" value="events"> Events</label>
+          <label><input type="checkbox" name="tags" value="reviews"> Reviews</label>
+        </div>
+      </div>
+
+      <div class="tag-group">
+        <h3>Opinion</h3>
+        <div class="checkbox-list">
+          <label><input type="checkbox" name="tags" value="opinion"> Opinion</label>
+        </div>
+        <span class="inline-hint">You can combine “Opinion” with other tags if appropriate.</span>
+      </div>
     </div>
 
-    <select id="newsDropdown" class="dropdown">
-      <option value="">Select News Tag</option>
-      <option value="happening-now">Happening Now</option>
-      <option value="politics">Politics</option>
-      <option value="environment">Environment</option>
-      <option value="transportation">Transportation</option>
-      <option value="education">Education</option>
-    </select>
+    <label>
+      <input type="checkbox" id="editorsPick">
+      Feature in Editor's Picks
+    </label>
 
-    <select id="cultureDropdown" class="dropdown">
-      <option value="">Select Culture Tag</option>
-      <option value="people">People</option>
-      <option value="events">Events</option>
-      <option value="reviews">Reviews</option>
-    </select>
-
-<label>
-  <input type="checkbox" id="editorsPick">
-  Feature in Editor's Picks
-</label>
-    
-    <button type="submit" style="margin-top: 20px;">Publish Article</button>
+    <button type="submit">Publish Article</button>
   </form>
 
   <script>
-    const tagButtons = document.querySelectorAll('.tag-button');
-    const newsDropdown = document.getElementById('newsDropdown');
-    const cultureDropdown = document.getElementById('cultureDropdown');
-    let selectedTag = '';
-
-    tagButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tagButtons.forEach(b => b.classList.remove('active'));
-        button.classList.add('active');
-
-        newsDropdown.style.display = 'none';
-        cultureDropdown.style.display = 'none';
-        selectedTag = button.dataset.group;
-
-        if (selectedTag === 'news') {
-          newsDropdown.style.display = 'block';
-        } else if (selectedTag === 'culture') {
-          cultureDropdown.style.display = 'block';
-        }
-      });
-    });
-
     document.getElementById('articleForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const activeGroup = document.querySelector('.tag-button.active')?.dataset.group || '';
-      let selectedTag = '';
+      // Collect selected tags (array)
+      const tagChecks = Array.from(document.querySelectorAll('input[name="tags"]:checked'));
+      const selectedTags = tagChecks.map(cb => cb.value);
 
-      if (activeGroup === 'news') {
-        selectedTag = newsDropdown.value;
-      } else if (activeGroup === 'culture') {
-        selectedTag = cultureDropdown.value;
-      } else if (activeGroup === 'opinion') {
-        selectedTag = 'opinion';
-      }
-
-      if (!selectedTag) {
-        alert("Please select a tag.");
+      if (selectedTags.length === 0) {
+        alert("Please select at least one tag.");
         return;
       }
 
       const customDate = document.getElementById('date').value;
-
-     const newArticle = {
-  id: Date.now(),
-  title: document.getElementById('title').value,
-  author: document.getElementById('author').value,
-  image: document.getElementById('image').value,
-  body: document.getElementById('body').value,
-  tag: selectedTag,
-  timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
-  views: 0,
-  editorsPick: document.getElementById('editorsPick').checked
-};
+      const newArticle = {
+        id: Date.now(),
+        title: document.getElementById('title').value,
+        author: document.getElementById('author').value,
+        image: document.getElementById('image').value,
+        body: document.getElementById('body').value,
+        tag: selectedTags, // <-- now an array
+        timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
+        views: 0,
+        editorsPick: document.getElementById('editorsPick').checked
+      };
 
       const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+      // Put newest first
       articles.unshift(newArticle);
       localStorage.setItem('articles', JSON.stringify(articles));
 
       alert("Article published!");
       this.reset();
-      tagButtons.forEach(b => b.classList.remove('active'));
-      newsDropdown.style.display = 'none';
-      cultureDropdown.style.display = 'none';
     });
   </script>
 </body>
