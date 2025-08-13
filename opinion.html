@@ -16,6 +16,11 @@
     <section id="opinion-articles" class="article-list"></section>
   </main>
 
+  <!-- All Articles Button -->
+  <div class="all-articles-cta">
+    <a href="all-articles.html" class="btn-pill">View All Articles</a>
+  </div>
+
   <script>
     const articles = JSON.parse(localStorage.getItem("articles") || "[]");
     const container = document.getElementById("opinion-articles");
@@ -41,3 +46,4 @@
   </script>
 </body>
 </html>
+
