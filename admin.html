@@ -53,7 +53,7 @@
     .admin-nav a {
       margin: 0 10px;
       text-decoration: none;
-      color: #0077cc;
+      color: #B5281A;
     }
   </style>
 </head>
@@ -156,17 +156,17 @@
 
       const customDate = document.getElementById('date').value;
 
-      const newArticle = {
-        id: Date.now(),
-        title: document.getElementById('title').value,
-        author: document.getElementById('author').value,
-        image: document.getElementById('image').value,
-        body: document.getElementById('body').value,
-        tag: selectedTag,
-        timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
-        views: 0
-        editorsPick: document.getElementById('editorsPick').checked
-      };
+     const newArticle = {
+  id: Date.now(),
+  title: document.getElementById('title').value,
+  author: document.getElementById('author').value,
+  image: document.getElementById('image').value,
+  body: document.getElementById('body').value,
+  tag: selectedTag,
+  timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
+  views: 0,
+  editorsPick: document.getElementById('editorsPick').checked
+};
 
       const articles = JSON.parse(localStorage.getItem('articles') || '[]');
       articles.unshift(newArticle);
@@ -181,4 +181,3 @@
   </script>
 </body>
 </html>
-<a href="admin-manage.html">Manage Articles</a> 
