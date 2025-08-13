@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>All Articles</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Georgia, serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      margin: 0 0 20px 0;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+    .article {
+      border-bottom: 1px solid #eee;
+      padding: 18px 0;
+    }
+    .article h2 {
+      margin: 0 0 6px 0;
+      font-size: 1.4em;
+    }
+    .meta {
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 8px;
+    }
+    .article h2 a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .article h2 a:hover {
+      color: #B5281A;
+    }
+    /* Tag pills (same as article.html/tag.html) */
+    .tag-pills {
+      margin: 6px 0 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px solid #B5281A;
+      color: #B5281A;
+      border-radius: 9999px;
+      font-size: 0.85em;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+    .tag-pill:hover {
+      background: #B5281A;
+      color: #fff;
+    }
+    .excerpt { word-break: break-word; }
+  </style>
+</head>
+<body>
+  <h1>All Articles</h1>
+  <div id="allArticles"></div>
+
+  <script>
+    const listEl = document.getElementById('allArticles');
+    const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+
+    if (!articles.length) {
+      listEl.innerHTML = '<p>No articles yet.</p>';
+    } else {
+      const sorted = [...articles].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      sorted.forEach(article => {
+        const tags = Array.isArray(article.tag) ? article.tag : (article.tag ? [article.tag] : []);
+        const pillsHTML = tags.map(t => {
+          const slug = String(t);
+          const label = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          return `<a class="tag-pill" href="tag.html?tag=${encodeURIComponent(slug)}">${label}</a>`;
+        }).join('');
+
+        const dateStr = article.timestamp
+          ? new Date(article.timestamp).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' })
+          : 'Unknown date';
+
+        const excerpt = (article.body || '').split(' ').slice(0, 40).join(' ');
+
+        const div = document.createElement('div');
+        div.className = 'article';
+        div.innerHTML = `
+          <h2><a href="article.html?id=${article.id}">${article.title}</a></h2>
+          <div class="meta">By ${article.author || ''} — ${dateStr}${typeof article.views === 'number' ? ` — ${article.views} views` : ''}</div>
+          ${tags.length ? `<div class="tag-pills">${pillsHTML}</div>` : ''}
+          ${article.image ? `<a href="article.html?id=${article.id}"><img src="${article.image}" alt="Image for ${article.title}" loading="lazy" style="max-width:100%;height:auto;margin:10px 0;"></a>` : ''}
+          <p class="excerpt">${excerpt}...</p>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
