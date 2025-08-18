@@ -72,10 +72,11 @@
   <div id="articlesContainer"></div>
 
   <script>
+    (async function () {
     const params = new URLSearchParams(window.location.search);
 const rawTag = params.get('tag') || '';
 const tag = decodeURIComponent(rawTag).toLowerCase(); // robust & case-insensitive
-    const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+    const articles = await fetch('/data/articles.json').then(r => r.json()).catch(() => []);
     const container = document.getElementById('articlesContainer');
     const tagTitle = document.getElementById('tagTitle');
     tagTitle.textContent = tag
