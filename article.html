@@ -123,6 +123,33 @@ if (!idParam || Number.isNaN(id)) {
       ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
       <div class="article-body">${article.body || ''}</div>
     `;
+    function slugifyName(name) {
+  return (name || '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-]/g, '');
+}
+
+const authorsMap = JSON.parse(localStorage.getItem('authors') || '{}');
+const aSlug = article.authorSlug || slugifyName(article.author || '');
+const aData = authorsMap[aSlug] || { name: article.author || 'Unknown', photo: '', bio: '' };
+const aLink = `author.html?author=${encodeURIComponent(aSlug)}`;
+const aPhoto = aData.photo || 'images/author-placeholder.png'; // optional placeholder
+
+const authorBlock = document.createElement('div');
+authorBlock.className = 'author-card';
+authorBlock.innerHTML = `
+  <a href="${aLink}">
+    <img src="${aPhoto}" alt="${aData.name}">
+  </a>
+  <div>
+    <a class="name" href="${aLink}">${aData.name}</a>
+  </div>
+`;
+
+// Append to the container
+container.appendChild(authorBlock);
   }
 }
   </script>
