@@ -116,13 +116,16 @@ if (!idParam || Number.isNaN(id)) {
     }).join('');
 
     container.innerHTML = `
-      <h1 class="article-title">${article.title}</h1>
-      <div class="author">By ${article.author || ''}</div>
-      <div class="date">Published on ${dateStr} | ${article.views} views</div>
-      ${tags.length ? `<div class="tag-pills">${pillsHTML}</div>` : ''}
-      ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
-      <div class="article-body">${article.body || ''}</div>
-    `;
+  <h1 class="article-title">${article.title}</h1>
+  <div class="author">By ${article.author || ''}</div>
+  <div class="date">Published on ${dateStr} | ${article.views} views</div>
+  ${tags.length ? `<div class="tag-pills">${pillsHTML}</div>` : ''}
+  ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
+  <div class="article-body">${article.body || ''}</div>
+  <div class="all-articles-cta" style="margin-top: 24px;">
+    <a href="all-articles.html" class="btn-pill">View All Articles</a>
+  </div>
+`;
     function slugifyName(name) {
   return (name || '')
     .toLowerCase()
