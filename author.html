@@ -95,7 +95,7 @@
         .toLowerCase()
         .trim()
         .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9\\-]/g, '');
+        .replace(/[^a-z0-9-]/g, '');
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -122,7 +122,7 @@
       // Show author header (fallback to inferred name if missing in registry)
       const inferredName = (() => {
         const any = articles.find(a => (a.authorSlug || slugifyName(a.author || '')) === authorSlug);
-        return any?.author || authorSlug.replace(/-/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());
+        return any?.author || authorSlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
       })();
 
       const displayName = author?.name || inferredName;
@@ -151,7 +151,7 @@
           const tags = Array.isArray(article.tag) ? article.tag : (article.tag ? [article.tag] : []);
           const pillsHTML = tags.map(t => {
             const slug = String(t);
-            const label = slug.replace(/-/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());
+            const label = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             return \`<a class="tag-pill" href="tag.html?tag=\${encodeURIComponent(slug)}">\${label}</a>\`;
           }).join('');
 
