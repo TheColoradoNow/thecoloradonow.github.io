@@ -89,6 +89,11 @@
 
     <label for="author">Author:</label>
     <input type="text" id="author" required>
+    <label for="authorPhoto">Author Photo URL (optional):</label>
+<input type="url" id="authorPhoto" placeholder="https://…">
+
+<label for="authorBio">Author Bio (optional):</label>
+<textarea id="authorBio" rows="4" placeholder="Short bio shown on the author page."></textarea>
 
     <label for="image">Image URL:</label>
     <input type="url" id="image" placeholder="https://…">
@@ -139,6 +144,14 @@
   </form>
 
   <script>
+    function slugifyName(name) {
+    return (name || '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\-]/g, '');
+  } 
+    
     document.getElementById('articleForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -152,17 +165,33 @@
       }
 
       const customDate = document.getElementById('date').value;
+      // Gather author info
+const authorName = document.getElementById('author').value;
+const authorSlug = slugifyName(authorName);
+const authorPhoto = document.getElementById('authorPhoto').value;
+const authorBio = document.getElementById('authorBio').value;
+
+// Upsert authors registry in localStorage
+const authors = JSON.parse(localStorage.getItem('authors') || '{}');
+authors[authorSlug] = {
+  name: authorName,
+  photo: authorPhoto || (authors[authorSlug]?.photo || ''),
+  bio: authorBio || (authors[authorSlug]?.bio || '')
+};
+localStorage.setItem('authors', JSON.stringify(authors));
+
       const newArticle = {
-        id: Date.now(),
-        title: document.getElementById('title').value,
-        author: document.getElementById('author').value,
-        image: document.getElementById('image').value,
-        body: document.getElementById('body').value,
-        tag: selectedTags, // <-- now an array
-        timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
-        views: 0,
-        editorsPick: document.getElementById('editorsPick').checked
-      };
+  id: Date.now(),
+  title: document.getElementById('title').value,
+  author: document.getElementById('author').value,
+  authorSlug: authorSlug,  // <-- added
+  image: document.getElementById('image').value,
+  body: document.getElementById('body').value,
+  tag: selectedTags, // if your file still has single-select, this might be selectedTag
+  timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
+  views: 0,
+  editorsPick: document.getElementById('editorsPick').checked
+};
 
       const articles = JSON.parse(localStorage.getItem('articles') || '[]');
       // Put newest first
