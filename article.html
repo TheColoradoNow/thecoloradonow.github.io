@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -81,80 +81,106 @@
 </head>
 <body>
   <div id="articleContainer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_PUBLIC_ANON_KEY';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-const idParam = params.get('id');
-const id = Number(idParam);
-const container = document.getElementById('articleContainer');
+(async function () {
+  const params = new URLSearchParams(window.location.search);
+  const idParam = params.get('id');
+  const id = Number(idParam);
+  const container = document.getElementById('articleContainer');
 
-if (!idParam || Number.isNaN(id)) {
-  container.innerHTML = '<p>Invalid article link.</p>';
-} else {
-  const articles = JSON.parse(localStorage.getItem('articles') || '[]');
-  const article = articles.find(a => a.id === id);
-
-  if (!article) {
-    container.innerHTML = '<p>Article not found.</p>';
-  } else {
-    // Increment views
-    article.views = (article.views || 0) + 1;
-    localStorage.setItem('articles', JSON.stringify(articles));
-
-    const dateStr = article.timestamp
-      ? new Date(article.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-      : 'Unknown date';
-
-    // Make sure we always have an array of tags
-    const tags = Array.isArray(article.tag) ? article.tag : (article.tag ? [article.tag] : []);
-
-    // Build the pills HTML
-    const pillsHTML = tags.map(t => {
-      const slug = String(t);
-      const label = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      return `<a class="tag-pill" href="tag.html?tag=${encodeURIComponent(slug)}">${label}</a>`;
-    }).join('');
-
-    container.innerHTML = `
-  <h1 class="article-title">${article.title}</h1>
-  <div class="author">By ${article.author || ''}</div>
-  <div class="date">Published on ${dateStr} | ${article.views} views</div>
-  ${tags.length ? `<div class="tag-pills">${pillsHTML}</div>` : ''}
-  ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
-  <div class="article-body">${article.body || ''}</div>
-  <div class="all-articles-cta" style="margin-top: 24px;">
-    <a href="all-articles.html" class="btn-pill">View All Articles</a>
-  </div>
-`;
-    function slugifyName(name) {
-  return (name || '')
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9\-]/g, '');
-}
-
-const authorsMap = JSON.parse(localStorage.getItem('authors') || '{}');
-const aSlug = article.authorSlug || slugifyName(article.author || '');
-const aData = authorsMap[aSlug] || { name: article.author || 'Unknown', photo: '', bio: '' };
-const aLink = `author.html?author=${encodeURIComponent(aSlug)}`;
-const aPhoto = aData.photo || 'images/author-placeholder.png'; // optional placeholder
-
-const authorBlock = document.createElement('div');
-authorBlock.className = 'author-card';
-authorBlock.innerHTML = `
-  <a href="${aLink}">
-    <img src="${aPhoto}" alt="${aData.name}">
-  </a>
-  <div>
-    <a class="name" href="${aLink}">${aData.name}</a>
-  </div>
-`;
-
-// Append to the container
-container.appendChild(authorBlock);
+  if (!idParam || Number.isNaN(id)) {
+    container.innerHTML = '<p>Invalid article link.</p>';
+    return;
   }
-}
-  </script>
+
+  // 1) Fetch the article
+  const { data: article, error } = await supabase
+    .from('articles')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !article) {
+    container.innerHTML = '<p>Article not found.</p>';
+    console.error(error);
+    return;
+  }
+
+  // 2) Increment views safely via RPC (no arbitrary writes)
+  try {
+    await supabase.rpc('increment_article_view', { p_id: id });
+    // Fetch updated views (optional)
+    const { data: updated, error: viewErr } = await supabase
+      .from('articles')
+      .select('views')
+      .eq('id', id)
+      .single();
+    if (!viewErr && updated) article.views = updated.views;
+  } catch (e) {
+    console.warn('View increment failed:', e);
+  }
+
+  // 3) Render (this keeps your existing markup/logic)
+  const dateStr = article.timestamp
+    ? new Date(article.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'Unknown date';
+
+  const tags = Array.isArray(article.tags) ? article.tags
+              : (Array.isArray(article.tag) ? article.tag
+              : (article.tag ? [article.tag] : []));
+
+  const pillsHTML = tags.map(t => {
+    const slug = String(t);
+    const label = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<a class="tag-pill" href="tag.html?tag=${encodeURIComponent(slug)}">${label}</a>`;
+  }).join('');
+
+  container.innerHTML = `
+    <h1 class="article-title">${article.title}</h1>
+    <div class="author">By ${article.author || ''}</div>
+    <div class="date">Published on ${dateStr} | ${article.views ?? 0} views</div>
+    ${tags.length ? `<div class="tag-pills">${pillsHTML}</div>` : ''}
+    ${article.image ? `<img src="${article.image}" alt="Image for ${article.title}" loading="lazy">` : ''}
+    <div class="article-body">${article.body || ''}</div>
+    <div class="all-articles-cta" style="margin-top: 24px;">
+      <a href="all-articles.html" class="btn-pill">View All Articles</a>
+    </div>
+  `;
+
+  // 4) Author card (reads authors table)
+  function slugifyName(name) {
+    return (name || '').toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
+  // Prefer author_slug field; fallback to slugified name
+  const aSlug = article.author_slug || slugifyName(article.author || '');
+
+  const { data: authorRow } = await supabase
+    .from('authors')
+    .select('*')
+    .eq('slug', aSlug)
+    .single();
+
+  const aData = authorRow || { name: article.author || 'Unknown', photo: '', bio: '' };
+  const aLink = `author.html?author=${encodeURIComponent(aSlug)}`;
+  const aPhoto = aData.photo || 'images/author-placeholder.png';
+
+  const authorBlock = document.createElement('div');
+  authorBlock.className = 'author-card';
+  authorBlock.innerHTML = `
+    <a href="${aLink}"><img src="${aPhoto}" alt="${aData.name}"></a>
+    <div><a class="name" href="${aLink}">${aData.name}</a></div>
+  `;
+  container.appendChild(authorBlock);
+})();
+</script>
 </body>
 </html>
