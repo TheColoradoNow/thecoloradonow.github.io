@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Colorado Now</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_PUBLIC_ANON_KEY';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 </head>
 <body>
     <div class="top-link">
@@ -58,18 +64,24 @@
   <a href="all-articles.html" class="btn-pill">View All Articles</a>
 </div>
     <script>
-        (async function () {
-  const articles = await fetch('/data/articles.json').then(r => r.json()).catch(() => []);
+(async function () {
+  // 1) Fetch articles (newest first)
+  const { data: articles, error } = await supabase
+    .from('articles')
+    .select('*')
+    .order('timestamp', { ascending: false });
 
-  // Sort by timestamp descending
-  const sorted = [...articles].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-  // Get up to 2 most recent Editor's Picks
-  const editorsPicks = sorted.filter(article => article.editorsPick).slice(0, 2);
-
-  // Get up to 2 most recent articles overall
+  // 2) Pick sections
+  const sorted = articles || [];
+  const editorsPicks = sorted.filter(a => a.editors_pick).slice(0, 2);
   const latestArticles = sorted.slice(0, 2);
 
+  // 3) Render cards
   function createArticleCard(article) {
     const div = document.createElement('div');
     div.className = 'homepage-article-card';
@@ -88,6 +100,7 @@
 
   editorsPicks.forEach(article => editorsList.appendChild(createArticleCard(article)));
   latestArticles.forEach(article => latestList.appendChild(createArticleCard(article)));
+})();
 </script>
 </body>
 </html>
