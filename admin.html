@@ -82,10 +82,20 @@
   </div>
 
   <h1>Publish New Article</h1>
-
+  
+<div id="auth-box" style="margin:16px 0; border:1px solid #ddd; padding:12px; border-radius:6px;">
+  <p><strong>Sign in to publish</strong></p>
+  <input type="email" id="loginEmail" placeholder="you@example.com" style="max-width:320px;">
+  <button type="button" id="sendLink">Send magic sign-in link</button>
+  <p id="authStatus" style="font-size:13px;color:#666;margin-top:8px;"></p>
+</div>
+  
+<div id="admin-ui" style="display:none;">
   <form id="articleForm">
     <label for="title">Article Title:</label>
     <input type="text" id="title" required>
+
+    <form id="articleForm">
 
     <label for="author">Author:</label>
     <input type="text" id="author" required>
@@ -142,65 +152,128 @@
 
     <button type="submit">Publish Article</button>
   </form>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_PUBLIC_ANON_KEY';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 
-  <script>
-    function slugifyName(name) {
+ <script>
+  // ===== Auth UI =====
+  async function refreshAuthUI() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const signedIn = !!session;
+    document.getElementById('auth-box').style.display = signedIn ? 'none' : 'block';
+    document.getElementById('admin-ui').style.display = signedIn ? 'block' : 'none';
+    document.getElementById('authStatus').textContent = signedIn ? '' : 'Not signed in.';
+  }
+
+  document.getElementById('sendLink').addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) { alert('Enter your email'); return; }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href }
+    });
+    if (error) {
+      alert('Error sending link: ' + error.message);
+    } else {
+      document.getElementById('authStatus').textContent =
+        'Check your email for the sign-in link, then return to this page.';
+    }
+  });
+
+  supabase.auth.onAuthStateChange((_event, _session) => {
+    refreshAuthUI();
+  });
+
+  // Initial auth check
+  refreshAuthUI();
+
+  // ===== Helpers you already had =====
+  function slugifyName(name) {
     return (name || '')
       .toLowerCase()
       .trim()
       .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9\-]/g, '');
-  } 
-    
-    document.getElementById('articleForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+      .replace(/[^a-z0-9-]/g, '');
+  }
 
-      // Collect selected tags (array)
-      const tagChecks = Array.from(document.querySelectorAll('input[name="tags"]:checked'));
-      const selectedTags = tagChecks.map(cb => cb.value);
+  // ===== Publish handler (Supabase) =====
+  document.getElementById('articleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-      if (selectedTags.length === 0) {
-        alert("Please select at least one tag.");
+    // Collect selected tags (array) – this uses your existing checkboxes
+    const tagChecks = Array.from(document.querySelectorAll('input[name="tags"]:checked'));
+    const selectedTags = tagChecks.map(cb => cb.value);
+    if (selectedTags.length === 0) {
+      alert("Please select at least one tag.");
+      return;
+    }
+
+    const title = document.getElementById('title').value.trim();
+    const authorName = document.getElementById('author').value.trim();
+    const authorPhoto = document.getElementById('authorPhoto')?.value.trim() || '';
+    const authorBio   = document.getElementById('authorBio')?.value.trim() || '';
+    const image = document.getElementById('image').value.trim();
+    const body  = document.getElementById('body').value.trim();
+    const customDate = document.getElementById('date').value;
+    const editorsPick = document.getElementById('editorsPick').checked;
+
+    if (!title || !authorName || !body) {
+      alert('Title, Author, and Body are required.');
+      return;
+    }
+
+    const authorSlug = slugifyName(authorName);
+    const id = Date.now(); // keep using big timestamp IDs
+
+    // 1) Upsert author
+    {
+      const { error: authErr } = await supabase
+        .from('authors')
+        .upsert({
+          slug: authorSlug,
+          name: authorName,
+          photo: authorPhoto || null,
+          bio: authorBio || null
+        });
+      if (authErr) {
+        console.error(authErr);
+        alert('Failed to save author: ' + authErr.message);
         return;
       }
+    }
 
-      const customDate = document.getElementById('date').value;
-      // Gather author info
-const authorName = document.getElementById('author').value;
-const authorSlug = slugifyName(authorName);
-const authorPhoto = document.getElementById('authorPhoto').value;
-const authorBio = document.getElementById('authorBio').value;
+    // 2) Insert article
+    {
+      const { error: artErr } = await supabase
+        .from('articles')
+        .insert({
+          id,
+          title,
+          author: authorName,
+          author_slug: authorSlug,
+          image: image || null,
+          body,
+          tags: selectedTags, // Supabase will store JS array into text[]
+          timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
+          views: 0,
+          editors_pick: editorsPick
+        });
 
-// Upsert authors registry in localStorage
-const authors = JSON.parse(localStorage.getItem('authors') || '{}');
-authors[authorSlug] = {
-  name: authorName,
-  photo: authorPhoto || (authors[authorSlug]?.photo || ''),
-  bio: authorBio || (authors[authorSlug]?.bio || '')
-};
-localStorage.setItem('authors', JSON.stringify(authors));
+      if (artErr) {
+        console.error(artErr);
+        alert('Failed to publish article: ' + artErr.message);
+        return;
+      }
+    }
 
-      const newArticle = {
-  id: Date.now(),
-  title: document.getElementById('title').value,
-  author: document.getElementById('author').value,
-  authorSlug: authorSlug,  // <-- added
-  image: document.getElementById('image').value,
-  body: document.getElementById('body').value,
-  tag: selectedTags, // if your file still has single-select, this might be selectedTag
-  timestamp: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
-  views: 0,
-  editorsPick: document.getElementById('editorsPick').checked
-};
-
-      const articles = JSON.parse(localStorage.getItem('articles') || '[]');
-      // Put newest first
-      articles.unshift(newArticle);
-      localStorage.setItem('articles', JSON.stringify(articles));
-
-      alert("Article published!");
-      this.reset();
-    });
-  </script>
+    alert('Article published!');
+    this.reset();
+  });
+</script>
 </body>
 </html>
