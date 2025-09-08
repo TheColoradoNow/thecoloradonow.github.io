@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-  const SUPABASE_ANON_KEY = 'YOUR_PUBLIC_ANON_KEY';
+  const SUPABASE_URL = 'https://hnvcbrlyuytmawlpgaal.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhudmNicmx5dXl0bWF3bHBnYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI5NTYsImV4cCI6MjA3MTExODk1Nn0.Ik4LauJ_QOJGOo9ZOCbxmyldyqVtJy_PfCt-2rH4hLw';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 </head>
@@ -65,21 +65,34 @@
 </div>
     <script>
 (async function () {
-  // 1) Fetch articles (newest first)
-  const { data: articles, error } = await supabase
+  const editorsList = document.getElementById('editors-picks-list');
+  const latestList = document.getElementById('latest-articles-list');
+
+  // 1) Fetch only the columns we actually render (lighter payload)
+  const { data: rows, error } = await supabase
     .from('articles')
-    .select('*')
+    .select('id,title,author,image,timestamp,editors_pick,editorsPick') // supports both snake & camel
     .order('timestamp', { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error('Error loading articles:', error);
+    editorsList.innerHTML = '<p>Could not load articles.</p>';
+    latestList.innerHTML = '<p>Could not load articles.</p>';
     return;
   }
 
-  // 2) Pick sections
-  const sorted = articles || [];
-  const editorsPicks = sorted.filter(a => a.editors_pick).slice(0, 2);
-  const latestArticles = sorted.slice(0, 2);
+  const articles = rows || [];
+
+  // Helper: normalize editors pick (support old camelCase too)
+  const isEditorsPick = (a) => a.editors_pick === true || a.editorsPick === true;
+
+  // 2) Build sections
+  //    a) Editor's Picks: newest first, up to 2
+  const editorsPicks = articles.filter(isEditorsPick).slice(0, 2);
+
+  //    b) The Latest: newest overall, up to 2, but avoid duplicating picks
+  const pickIds = new Set(editorsPicks.map(a => a.id));
+  const latestArticles = articles.filter(a => !pickIds.has(a.id)).slice(0, 2);
 
   // 3) Render cards
   function createArticleCard(article) {
@@ -89,17 +102,26 @@
       <a href="article.html?id=${article.id}">
         ${article.image ? `<img src="${article.image}" alt="${article.title}" class="thumb" loading="lazy">` : ''}
         <h3>${article.title}</h3>
-        <p>By ${article.author}</p>
+        <p>By ${article.author || ''}</p>
       </a>
     `;
     return div;
   }
 
-  const editorsList = document.getElementById('editors-picks-list');
-  const latestList = document.getElementById('latest-articles-list');
+  editorsList.innerHTML = '';
+  latestList.innerHTML = '';
 
-  editorsPicks.forEach(article => editorsList.appendChild(createArticleCard(article)));
-  latestArticles.forEach(article => latestList.appendChild(createArticleCard(article)));
+  if (editorsPicks.length === 0) {
+    editorsList.innerHTML = '<p>No Editor\'s Picks yet.</p>';
+  } else {
+    editorsPicks.forEach(a => editorsList.appendChild(createArticleCard(a)));
+  }
+
+  if (latestArticles.length === 0) {
+    latestList.innerHTML = '<p>No recent articles yet.</p>';
+  } else {
+    latestArticles.forEach(a => latestList.appendChild(createArticleCard(a)));
+  }
 })();
 </script>
 </body>
