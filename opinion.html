@@ -20,42 +20,78 @@
   <div class="all-articles-cta">
     <a href="all-articles.html" class="btn-pill">View All Articles</a>
   </div>
+  
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://hnvcbrlyuytmawlpgaal.supabase.co';   /* <-- keep yours */
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhudmNicmx5dXl0bWF3bHBnYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI5NTYsImV4cCI6MjA3MTExODk1Nn0.Ik4LauJ_QOJGOo9ZOCbxmyldyqVtJy_PfCt-2rH4hLw'; /* <-- keep yours */
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 
   <script>
-    const articles = JSON.parse(localStorage.getItem("articles") || "[]");
-    const container = document.getElementById("opinion-articles");
+(async function () {
+  const container = document.getElementById("opinion-articles");
 
-    const filtered = articles
-  .filter(a => {
-    const tags = Array.isArray(a.tag) ? a.tag : (a.tag ? [a.tag] : []);
-    return tags.includes("opinion");
-  })
-  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  // 1) Fetch only the columns we need, newest first
+  const { data: rows, error } = await supabase
+    .from('articles')
+    .select('id,title,author,image,body,tags,tag,timestamp')
+    .order('timestamp', { ascending: false });
 
-    if (filtered.length === 0) {
-      container.innerHTML = "<p>No opinion articles found.</p>";
-    } else {
-      filtered.forEach(article => {
-  const div = document.createElement("div");
-  div.className = "article-preview";
+  if (error) {
+    console.error('Error loading articles:', error);
+    container.innerHTML = "<p>Could not load articles.</p>";
+    return;
+  }
 
-  const excerpt = (article.body || "").split(" ").slice(0, 40).join(" ");
-  const imgHTML = article.image
-    ? `<a href="article.html?id=${article.id}">
-         <img src="${article.image}" alt="Image for ${article.title}" loading="lazy" style="max-width:100%;height:auto;margin:10px 0;">
-       </a>`
-    : "";
-
-  div.innerHTML = `
-    <h2><a href="article.html?id=${article.id}" style="text-decoration:none;color:inherit;">${article.title}</a></h2>
-    <p><em>By ${article.author || ""}</em></p>
-    ${imgHTML}
-    <p>${excerpt}... <a href="article.html?id=${article.id}" style="text-decoration:none;">Read more →</a></p>
-  `;
-  container.appendChild(div);
-});
+  // 2) Filter to "opinion" (supports tags[] or legacy single tag)
+  const filtered = (rows || []).filter(a => {
+    // Prefer new tags[]
+    if (Array.isArray(a.tags) && a.tags.length) {
+      return a.tags.map(t => String(t).toLowerCase()).includes('opinion');
     }
-  </script>
+    // Legacy: tag can be array or string
+    if (Array.isArray(a.tag)) {
+      return a.tag.map(t => String(t).toLowerCase()).includes('opinion');
+    }
+    if (a.tag) {
+      return String(a.tag).toLowerCase() === 'opinion';
+    }
+    return false;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = "<p>No opinion articles found.</p>";
+    return;
+  }
+
+  // 3) Render cards
+  container.innerHTML = '';
+  filtered.forEach(article => {
+    const div = document.createElement("div");
+    div.className = "article-preview";
+
+    const excerpt = (article.body || '')
+      .replace(/<[^>]+>/g, ' ')           // strip HTML tags for a cleaner snippet
+      .split(/\s+/).slice(0, 40).join(' ');
+
+    const imgHTML = article.image
+      ? `<a href="article.html?id=${article.id}">
+           <img src="${article.image}" alt="Image for ${article.title}" loading="lazy" style="max-width:100%;height:auto;margin:10px 0;">
+         </a>`
+      : "";
+
+    div.innerHTML = `
+      <h2><a href="article.html?id=${article.id}" style="text-decoration:none;color:inherit;">${article.title}</a></h2>
+      <p><em>By ${article.author || ""}</em></p>
+      ${imgHTML}
+      <p>${excerpt}... <a href="article.html?id=${article.id}" style="text-decoration:none;">Read more →</a></p>
+    `;
+    container.appendChild(div);
+  });
+})();
+</script>
 </body>
 </html>
 
