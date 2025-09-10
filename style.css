@@ -338,7 +338,3 @@ body {
   color: #B5281A; /* Colorado flag red on hover */
 }
 
-/* Hover effect for admin-manage article links */
-#articlesTable a:hover {
-  color: #B5281A;
-}
